@@ -1,0 +1,125 @@
+/* manifest.json */
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Profile Enhancer",
+  "version": "1.0",
+  "description": "Injects a widget into LinkedIn profile pages",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["*://www.linkedin.com/in/*"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  }
+}
+
+/* content.js */
+const data = {
+  companyName: "TechCorp",
+  matchScore: 86,
+  accountStatus: "Target"
+};
+
+function createWidget(data) {
+  const widget = document.createElement('div');
+  widget.id = 'linkedin-enhancer-widget';
+
+  const statusColor = data.accountStatus === "Target" ? 'green' : 'red';
+
+  widget.innerHTML = `
+    <div class="header"><strong>${data.companyName}</strong></div>
+    <div class="score">
+      <label>Match Score: ${data.matchScore}</label>
+      <progress value="${data.matchScore}" max="100"></progress>
+    </div>
+    <div class="status ${statusColor}">${data.accountStatus}</div>
+  `;
+
+  document.body.appendChild(widget);
+}
+
+chrome.storage.sync.get("showWidget", ({ showWidget }) => {
+  if (showWidget !== false) createWidget(data);
+});
+
+/* popup.html */
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; padding: 10px; }
+    label { display: block; margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <label>
+    <input type="checkbox" id="toggleWidget"> Show Widget
+  </label>
+  <script>
+    const toggle = document.getElementById('toggleWidget');
+
+    chrome.storage.sync.get('showWidget', ({ showWidget }) => {
+      toggle.checked = showWidget !== false;
+    });
+
+    toggle.addEventListener('change', () => {
+      chrome.storage.sync.set({ showWidget: toggle.checked });
+    });
+  </script>
+</body>
+</html>
+
+/* style.css */
+#linkedin-enhancer-widget {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  width: 280px;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  padding: 15px;
+  z-index: 10000;
+  font-family: Arial, sans-serif;
+  border-radius: 8px;
+}
+
+#linkedin-enhancer-widget .header {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+#linkedin-enhancer-widget .score label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+#linkedin-enhancer-widget .score progress {
+  width: 100%;
+  height: 16px;
+}
+
+#linkedin-enhancer-widget .status {
+  margin-top: 10px;
+  padding: 6px;
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+}
+
+#linkedin-enhancer-widget .green {
+  background-color: #28a745;
+}
+
+#linkedin-enhancer-widget .red {
+  background-color: #dc3545;
+}

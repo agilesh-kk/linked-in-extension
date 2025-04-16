@@ -1,0 +1,18 @@
+<!-- popup.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Toggle Widget Visibility</title>
+</head>
+<body>
+  <button id="toggle">Toggle Widget</button>
+  <script>
+    document.getElementById("toggle").addEventListener("click", function () {
+      chrome.runtime.sendMessage({ action: "toggleVisibility" }, function (response) {
+        alert(response.widgetVisible ? "Widget Visible" : "Widget Hidden");
+      });
+    });
+  </script>
+</body>
+</html>

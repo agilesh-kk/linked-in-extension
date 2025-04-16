@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Widget",
+  "version": "1.0",
+  "description": "Displays a company widget on LinkedIn profiles.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/in/*"],
+      "js": ["inject.js"],
+      "css": ["style.css"]
+    }
+  ]
+}
